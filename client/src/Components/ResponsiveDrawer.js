@@ -28,8 +28,8 @@ const pages = [
   { label: 'Discussion', path: 'discussion', icon: <QuestionAnswerIcon /> },
   { label: 'Tips', path: 'tips', icon: <EmojiObjectsIcon /> },
   { label: 'Polls', path: 'polls', icon: <PollIcon /> },
-  { label: 'Study Materials', path: 'study-materials', icon: <LibraryBooksIcon /> }, // New button for Study Materials
-  { label: 'Chatbot', path: 'chatbot', icon: <SmartToyIcon /> }, // Updated icon for Chatbot
+  { label: 'Study Materials', path: 'study-materials', icon: <LibraryBooksIcon /> },
+  { label: 'Chatbot', path: 'chatbot', icon: <SmartToyIcon /> },
 ];
 
 const settings = [
@@ -63,65 +63,137 @@ function ResponsiveDrawer() {
           gridRow: '1 / -1',
           gridColumn: '1 / 2',
           '& .MuiDrawer-paper': {
-            width: 240,
+            width: 220,
             boxSizing: 'border-box',
-            backgroundColor: '#318CE7', 
+            backgroundColor: '#318CE7',
             color: '#fff',
+            overflow: 'hidden', 
           },
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', padding: 2 }}>
-          <BookIcon sx={{ mr: 1, color: '#fff' }} />
-          <Typography
-            variant="h6"
-            sx={{ cursor: 'pointer', color: '#fff' }}
-            onClick={() => navigate('/dashboard')}
-          >
-            StuBuddies
-          </Typography>
+        <Box 
+          sx={{ 
+            height: '100%',
+            display: 'flex',
+            flexDirection: 'column'
+          }}
+        >
+          <Box sx={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            padding: 2,
+            flexShrink: 0 
+          }}>
+            <BookIcon sx={{ mr: 1, color: '#fff', flexShrink: 0 }} />
+            <Typography
+              variant="h6"
+              sx={{ 
+                cursor: 'pointer', 
+                color: '#fff',
+                whiteSpace: 'nowrap',
+                overflow: 'hidden',
+                textOverflow: 'ellipsis'
+              }}
+              onClick={() => navigate('/dashboard')}
+            >
+              StuBuddies
+            </Typography>
+          </Box>
+
+          <Box sx={{ 
+            flex: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'space-between',
+            overflowY: 'hidden'
+          }}>
+            <List sx={{ 
+              width: '97%',
+              padding: 0,
+              '& .MuiListItem-root': {
+                height: `${100 / (pages.length + 1)}%`, 
+                minHeight: '50px',
+              }
+            }}>
+              {pages.map((page) => (
+                <ListItem
+                  button
+                  key={page.path}
+                  onClick={() => handlePageChange(page.path)}
+                  sx={{
+                    '&:hover': { backgroundColor: '#004494', transform: 'scale(1.05)' },
+                    transition: 'transform 0.2s ease-in-out',
+                    padding: '4px 16px',
+                  }}
+                >
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    width: '100%',
+                  }}>
+                    {page.icon}
+                    <ListItemText
+                      primary={page.label}
+                      sx={{ 
+                        ml: 2,
+                        '& .MuiListItemText-primary': {
+                          fontSize: '0.9rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          color: '#e6f7ff'
+                        }
+                      }}
+                    />
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
+
+            <List sx={{ 
+              width: '97%',
+              padding: 0,
+              marginTop: 'auto',
+              '& .MuiListItem-root': {
+                height: '50px',
+              }
+            }}>
+              {settings.map((setting) => (
+                <ListItem
+                  button
+                  key={setting.label}
+                  onClick={() => handlePageChange(setting.path)}
+                  sx={{
+                    '&:hover': { backgroundColor: '#004494', transform: 'scale(1.05)' },
+                    transition: 'transform 0.2s ease-in-out',
+                    padding: '4px 16px',
+                  }}
+                >
+                  <Box sx={{ 
+                    display: 'flex', 
+                    alignItems: 'center',
+                    width: '100%',
+                  }}>
+                    {setting.icon}
+                    <ListItemText
+                      primary={setting.label}
+                      sx={{ 
+                        ml: 2,
+                        '& .MuiListItemText-primary': {
+                          fontSize: '0.9rem',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          color: '#e6f7ff'
+                        }
+                      }}
+                    />
+                  </Box>
+                </ListItem>
+              ))}
+            </List>
+          </Box>
         </Box>
-        <List>
-          {pages.map((page) => (
-            <ListItem
-              button
-              key={page.path}
-              onClick={() => handlePageChange(page.path)}
-              sx={{
-                '&:hover': { backgroundColor: '#004494', transform: 'scale(1.05)' }, 
-                transition: 'transform 0.2s ease-in-out',
-                height: '56px',
-                padding: '10px 16px',
-              }}
-            >
-              {page.icon}
-              <ListItemText
-                primary={page.label}
-                sx={{ color: '#e6f7ff', ml: 2, fontSize: '1.5rem' }} 
-              />
-            </ListItem>
-          ))}
-        </List>
-        <List>
-          {settings.map((setting) => (
-            <ListItem
-              button
-              key={setting.label}
-              onClick={() => handlePageChange(setting.path)}
-              sx={{
-                '&:hover': { backgroundColor: '#004494', transform: 'scale(1.05)' },
-                transition: 'transform 0.2s ease-in-out',
-                height: '56px',
-                padding: '10px 16px',
-              }}
-            >
-              {setting.icon}
-              <ListItemText
-                primary={setting.label}
-                sx={{ color: '#e6f7ff', ml: 2, fontSize: '1.5rem' }}
-              />
-            </ListItem>
-          ))}
-        </List>
       </Drawer>
 
       <Box
@@ -129,7 +201,7 @@ function ResponsiveDrawer() {
         sx={{
           gridRow: '1 / -1',
           gridColumn: '2 / 3',
-          bgcolor: '#fdf5e2',  
+          bgcolor: '#fdf5e2',
           p: 3,
           display: 'flex',
           justifyContent: 'center',
