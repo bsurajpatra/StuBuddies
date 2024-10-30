@@ -1,25 +1,72 @@
-const express = require('express');
-const mongoose = require('mongoose');
-const authRoutes = require('./routes/auth');
-const cors = require('cors');
-require('dotenv').config(); // Import dotenv to load .env file
+const express = require("express");
+const cors = require("cors");
+const helmet = require("helmet");
+const morgan = require("morgan");
+const path = require("path");
+require("dotenv").config({ path: path.join(__dirname, '.env') });
 
+const requiredEnvVars = ['MONGODB_URI', 'JWT_SECRET'];
+const missingEnvVars = requiredEnvVars.filter(envVar => !process.env[envVar]);
+
+if (missingEnvVars.length > 0) {
+    console.error('Missing required environment variables:', missingEnvVars.join(', '));
+    process.exit(1);
+}
+
+const connectDB = require("./config/db");
+const authRoutes = require("./routes/authRoutes");
+
+const PORT = process.env.PORT || 3001;
 const app = express();
-const PORT = process.env.PORT || 5000;
 
-// Middleware
-app.use(cors());
-app.use(express.json());
+const startServer = async () => {
+    try {
+        await connectDB();
+        console.log('Database connected successfully');
 
-// Connect to MongoDB
-mongoose.connect(process.env.MONGODB_URI, {
-})
-.then(() => console.log('MongoDB connected'))
-.catch(err => console.error('MongoDB connection error:', err));
+        app.use(helmet());
+        app.use(morgan('dev'));
+        app.use(cors({
+            origin: "http://localhost:3000",
+            methods: ['GET', 'POST', 'PUT', 'DELETE'],
+            allowedHeaders: ['Content-Type', 'Authorization'],
+            credentials: true
+        }));
+        app.use(express.json());
+        app.use(express.urlencoded({ extended: true }));
 
-// Use auth routes
-app.use('/api/auth', authRoutes);
+        app.use("/api/auth", authRoutes);
 
-app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+        app.get('/api/health', (req, res) => {
+            res.json({ 
+                status: 'ok',
+                environment: process.env.NODE_ENV || 'development',
+                timestamp: new Date().toISOString()
+            });
+        });
+
+        app.use((err, req, res, next) => {
+            console.error("Error:", err.stack);
+            res.status(500).json({ 
+                message: "Something went wrong!", 
+                error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+            });
+        });
+
+        app.listen(PORT, () => {
+            console.log(`Server is running on port ${PORT}`);
+            console.log('Environment:', process.env.NODE_ENV || 'development');
+        });
+
+    } catch (error) {
+        console.error('Failed to start server:', error);
+        process.exit(1);
+    }
+};
+
+startServer();
+
+process.on('unhandledRejection', (err) => {
+    console.error('Unhandled Promise Rejection:', err);
+    process.exit(1);
 });

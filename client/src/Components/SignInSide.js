@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate, Link as RouterLink } from 'react-router-dom';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
@@ -16,29 +16,37 @@ import BackgroundImage from './Background.png';
 
 export default function SignInSide() {
   const navigate = useNavigate();
+  const [error, setError] = useState('');
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    setError('');
     const email = event.target.email.value;
     const password = event.target.password.value;
 
     try {
-      const response = await fetch('http://localhost:5000/api/auth/signin', {
+      const response = await fetch('http://localhost:3001/api/auth/signin', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        credentials: 'include',
         body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
+      
       if (response.ok) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('userEmail', email);
         navigate('/dashboard');
       } else {
-        alert(data.message);
+        setError(data.message || 'An error occurred during sign in');
       }
     } catch (error) {
       console.error('Error:', error);
+      setError('Unable to connect to the server. Please try again later.');
     }
   };
 
@@ -76,6 +84,11 @@ export default function SignInSide() {
             Sign in
           </Typography>
           <Box component="form" noValidate sx={{ mt: 1 }} onSubmit={handleSubmit}>
+            {error && (
+              <Typography color="error" sx={{ mb: 2 }}>
+                {error}
+              </Typography>
+            )}
             <TextField
               variant="outlined"
               margin="normal"

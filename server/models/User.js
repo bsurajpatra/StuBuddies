@@ -24,21 +24,6 @@ const userSchema = new mongoose.Schema({
         enum: ['Male', 'Female', 'Preferred not to say'],
         required: true,
     },
-    // Commented out: OTP field
-    /*
-    otp: {
-        type: String,
-        validate: {
-            validator: function(v) {
-                return /^\d{6}$/.test(v); // Example: validate OTP to be a 6-digit number
-            },
-            message: props => `${props.value} is not a valid OTP!`
-        },
-    },
-    expiresAt: {
-        type: Date,
-    },
-    */
 }, { timestamps: true });
 
 const User = mongoose.model('User', userSchema);
