@@ -11,13 +11,28 @@ exports.signup = async (req, res) => {
             return res.status(500).json({ message: 'Server configuration error' });
         }
 
-        const { firstName, lastName, email, password, gender, termsAccepted } = req.body;
+        const { firstName, lastName, age, gender, username, email, phoneNumber, password, termsAccepted } = req.body;
 
-        if (!gender) return res.status(400).json({ message: 'Gender is required' });
-        if (!termsAccepted) return res.status(400).json({ message: 'Please accept the terms and conditions to sign up.' });
+        if (!firstName || !lastName || !age || !gender || !username || !email || !phoneNumber || !password) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
+        if (!termsAccepted) {
+            return res.status(400).json({ message: 'Please accept the terms and conditions to sign up.' });
+        }
 
         const hashedPassword = await bcrypt.hash(password, 10);
-        const newUser = new User({ firstName, lastName, email, password: hashedPassword, gender });
+
+        const newUser = new User({
+            firstName,
+            lastName,
+            age,
+            gender,
+            username,
+            email,
+            phoneNumber,
+            password: hashedPassword
+        });
+
         await newUser.save();
 
         res.status(201).json({ message: 'User created successfully.' });
